@@ -6,6 +6,8 @@ import com.rionautica.loja.security.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,6 +17,8 @@ public class AuthController {
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
 
     public AuthController(AuthenticationManager authManager,
                           JwtService jwtService,
@@ -38,6 +42,14 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponse(token, usuario.getNome(), usuario.getPerfil().name()));
     }
 
+
+    @GetMapping("/api/auth/gerar-hash")
+    public ResponseEntity<String> gerarHash(@RequestParam String senha) {
+        return ResponseEntity.ok(passwordEncoder.encode(senha));
+    }
+
     record LoginRequest(String login, String senha) {}
     record LoginResponse(String token, String nome, String perfil) {}
+
+
 }
