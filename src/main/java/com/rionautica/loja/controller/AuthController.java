@@ -43,7 +43,7 @@ public class AuthController {
     }
 
 
-    @GetMapping("/api/auth/gerar-hash")
+    @GetMapping("/gerar-hash")
     public ResponseEntity<String> gerarHash(@RequestParam String senha) {
         return ResponseEntity.ok(passwordEncoder.encode(senha));
     }
