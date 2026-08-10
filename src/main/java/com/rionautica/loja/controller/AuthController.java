@@ -17,15 +17,18 @@ public class AuthController {
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
 
     public AuthController(AuthenticationManager authManager,
                           JwtService jwtService,
-                          UsuarioRepository usuarioRepository) {
+                          UsuarioRepository usuarioRepository,
+                          PasswordEncoder passwordEncoder
+                          ) {
         this.authManager = authManager;
         this.jwtService = jwtService;
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")
