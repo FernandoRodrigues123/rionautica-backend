@@ -33,11 +33,28 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        System.out.println("LOGIN RECEBIDO: " + request.login);
+
+        Usuario usuario = usuarioRepository
+                .findByLogin(request.login)
+                .orElse(null);
+
+        System.out.println("USUARIO ENCONTRADO: " + (usuario != null));
+
+        if (usuario != null) {
+            System.out.println(
+                    "SENHA CONFERE: " +
+                            passwordEncoder.matches(
+                                    request.senha(),
+                                    usuario.getSenha()
+                            )
+            );
+        }
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.login(), request.senha())
         );
 
-        Usuario usuario = usuarioRepository.findByLogin(request.login())
+         usuario = usuarioRepository.findByLogin(request.login())
                 .orElseThrow();
 
         String token = jwtService.gerarToken(usuario);
