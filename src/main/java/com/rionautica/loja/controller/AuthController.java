@@ -54,12 +54,45 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.login(), request.senha())
         );
 
-         usuario = usuarioRepository.findByLogin(request.login())
+        usuario = usuarioRepository.findByLogin(request.login())
                 .orElseThrow();
 
         String token = jwtService.gerarToken(usuario);
 
         return ResponseEntity.ok(new LoginResponse(token, usuario.getNome(), usuario.getPerfil().name()));
+    }
+
+    @PostMapping("/conferir")
+    public ResponseEntity<String> conferirHash(@PathVariable String senha) {
+
+        Usuario usuario = usuarioRepository
+                .findByLogin("admin")
+                .orElse(null);
+
+        System.out.println("USUARIO ENCONTRADO: " + (usuario != null));
+        var r = passwordEncoder.matches(
+                senha,
+                usuario.getSenha()
+        );
+        if (usuario != null) {
+            System.out.println(
+                    "SENHA CONFERE: " +
+                           r
+            );
+        }
+        return ResponseEntity.ok("resposta " + r);
+    }
+
+    @PutMapping("/senha")
+    public void novaSenha(@PathVariable String senha){
+
+        Usuario usuario = usuarioRepository
+                .findByLogin("admin")
+                .orElse(null);
+        var senhaCriptografada = passwordEncoder.encode(senha);
+        usuario.setSenha(senhaCriptografada);
+        usuarioRepository.save(usuario);
+
     }
 
 
