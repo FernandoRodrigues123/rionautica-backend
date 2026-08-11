@@ -30,6 +30,14 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        // deixa passar sem verificar token
+        if (path.startsWith("/api/auth/")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -37,19 +45,23 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7);
-        String login = jwtService.extrairLogin(token);
+        try {
+            String token = authHeader.substring(7);
+            String login = jwtService.extrairLogin(token);
 
-        if (login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            usuarioRepository.findByLogin(login).ifPresent(usuario -> {
-                if (jwtService.tokenValido(token, usuario)) {
-                    var auth = new UsernamePasswordAuthenticationToken(
-                            usuario, null, usuario.getAuthorities()
-                    );
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
-            });
+            if (login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                usuarioRepository.findByLogin(login).ifPresent(usuario -> {
+                    if (jwtService.tokenValido(token, usuario)) {
+                        var auth = new UsernamePasswordAuthenticationToken(
+                                usuario, null, usuario.getAuthorities()
+                        );
+                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            // token inválido — deixa passar, o Security decide o que fazer
         }
 
         chain.doFilter(request, response);
