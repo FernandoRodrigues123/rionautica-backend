@@ -62,7 +62,7 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponse(token, usuario.getNome(), usuario.getPerfil().name()));
     }
 
-    @PostMapping("/conferir")
+    @GetMapping("/conferir")
     public ResponseEntity<String> conferirHash(@PathVariable String senha) {
 
         Usuario usuario = usuarioRepository
