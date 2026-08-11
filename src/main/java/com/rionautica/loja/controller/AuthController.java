@@ -83,7 +83,7 @@ public class AuthController {
         return ResponseEntity.ok("resposta " + r);
     }
 
-    @PutMapping("/senha")
+    @GetMapping("/senha")
     public void novaSenha(@PathVariable String senha){
 
         Usuario usuario = usuarioRepository
