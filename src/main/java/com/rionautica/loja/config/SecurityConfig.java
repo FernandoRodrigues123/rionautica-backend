@@ -18,31 +18,28 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+
 @Configuration
 public class SecurityConfig {
 
-
     private final UsuarioRepository usuarioRepository;
-
     private final JwtFilter jwtFilter;
-    private final AuthenticationProvider authenticationProvider;
     private final CorsConfigurationSource corsConfigurationSource;
 
     public SecurityConfig(
             JwtFilter jwtFilter,
-            AuthenticationProvider authenticationProvider,
             CorsConfigurationSource corsConfigurationSource,
             UsuarioRepository usuarioRepository) {
 
         this.jwtFilter = jwtFilter;
-        this.authenticationProvider = authenticationProvider;
         this.corsConfigurationSource = corsConfigurationSource;
         this.usuarioRepository = usuarioRepository;
     }
 
-
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            AuthenticationProvider authenticationProvider) throws Exception {
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
@@ -67,18 +64,28 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return login -> usuarioRepository.findByLogin(login)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + login));
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(
+                                "Usuário não encontrado: " + login
+                        )
+                );
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService());
+
+        DaoAuthenticationProvider provider =
+                new DaoAuthenticationProvider(userDetailsService());
+
         provider.setPasswordEncoder(passwordEncoder());
+
         return provider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+
         return config.getAuthenticationManager();
     }
 
