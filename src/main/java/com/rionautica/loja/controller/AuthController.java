@@ -63,7 +63,7 @@ public class AuthController {
     }
 
     @GetMapping("/conferir")
-    public ResponseEntity<String> conferirHash(@PathVariable String senha) {
+    public ResponseEntity<String> conferirHash(@RequestParam String senha) {
 
         Usuario usuario = usuarioRepository
                 .findByLogin("admin")
@@ -84,7 +84,7 @@ public class AuthController {
     }
 
     @GetMapping("/senha")
-    public void novaSenha(@PathVariable String senha){
+    public void novaSenha(@RequestParam String senha){
 
         Usuario usuario = usuarioRepository
                 .findByLogin("admin")
