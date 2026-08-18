@@ -32,6 +32,9 @@ public class Nota {
     @JsonIgnoreProperties("nota")
     private List<ProdutoNota> produtos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "nota", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("nota")
+    private List<ServicoNota> servicos = new ArrayList<>();
     @Column(nullable = false)
     private Double valorBruto;
 
@@ -52,4 +55,6 @@ public class Nota {
     // campo auxiliar para controle
     @Column(nullable = false)
     private Double valorPago = 0.0;
+    @Column(columnDefinition = "TEXT")
+    private String observacao;
 }

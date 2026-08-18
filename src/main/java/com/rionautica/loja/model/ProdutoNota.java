@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "produto_nota")
 @Getter
@@ -24,12 +27,10 @@ public class ProdutoNota {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "produto_id")
-    @JsonIgnoreProperties({"descricao", "quantidade", "quantidadeMinima"})
     private Produto produto;
 
-    @Column(nullable = false)
-    private Integer quantidade;
 
-    @Column(nullable = false)
+    private Integer quantidade;
     private Double valorUnitario;
+    private String descricao;
 }

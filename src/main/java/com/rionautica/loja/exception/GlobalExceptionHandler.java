@@ -38,4 +38,13 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(corpo);
     }
+    @ExceptionHandler(ServicoNaoEncontradoException.class)
+    public ResponseEntity<Map<String, Object>> handleServicoNaoEncontrado(ServicoNaoEncontradoException ex) {
+        Map<String, Object> corpo = Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", HttpStatus.NOT_FOUND.value(),
+                "mensagem", ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(corpo);
+    }
 }

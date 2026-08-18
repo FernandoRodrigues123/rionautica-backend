@@ -59,6 +59,9 @@ public class NotaService {
 
     @Transactional
     public Nota criar(Long clienteId, List<ProdutoNota> itens, Double desconto) {
+   //     if ((itens == null || itens.isEmpty()) && (servicos == null || servicos.isEmpty())) {
+     //       throw new IllegalArgumentException("A nota deve ter pelo menos um produto ou serviço.");
+       // }
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado: " + clienteId));
 
