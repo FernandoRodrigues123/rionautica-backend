@@ -24,4 +24,6 @@ public class Servico {
 
     @Column
     private Double valor;
+    @Column(nullable = false)
+    private Boolean revisao = false;
 }

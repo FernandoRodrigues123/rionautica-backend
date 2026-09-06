@@ -1,9 +1,13 @@
 package com.rionautica.loja.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "cliente")
@@ -41,4 +45,8 @@ public abstract class Cliente {
 
     @Column(nullable = false, length = 2)
     private String estado;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("cliente")
+    private List<Veiculo> veiculos = new ArrayList<>();
 }

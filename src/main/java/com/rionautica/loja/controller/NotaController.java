@@ -2,6 +2,7 @@ package com.rionautica.loja.controller;
 
 import com.rionautica.loja.model.Nota;
 import com.rionautica.loja.model.ProdutoNota;
+import com.rionautica.loja.model.ServicoNota;
 import com.rionautica.loja.model.StatusPagamento;
 import com.rionautica.loja.services.NotaService;
 import org.springframework.http.HttpStatus;
@@ -17,18 +18,7 @@ public class NotaController {
 
     private final NotaService notaService;
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Nota> atualizar(
-            @PathVariable Long id,
-            @RequestBody CriarNotaRequest request
-    ) {
-        return ResponseEntity.ok(notaService.atualizar(
-                id,
-                request.clienteId(),
-                request.itens(),
-                request.desconto()
-        ));
-    }
+
 
     public NotaController(NotaService notaService) {
         this.notaService = notaService;
@@ -67,9 +57,26 @@ public class NotaController {
         Nota nota = notaService.criar(
                 request.clienteId(),
                 request.itens(),
-                request.desconto()
+                request.servicos(),
+                request.desconto(),
+                request.observacao()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(nota);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Nota> atualizar(
+            @PathVariable Long id,
+            @RequestBody CriarNotaRequest request
+    ) {
+        return ResponseEntity.ok(notaService.atualizar(
+                id,
+                request.clienteId(),
+                request.itens(),
+                request.servicos(),
+                request.desconto(),
+                request.observacao()
+        ));
     }
 
     @PatchMapping("/{id}/pagamento")
@@ -98,7 +105,13 @@ public class NotaController {
     // Records de request
     // -------------------------
 
-    record CriarNotaRequest(Long clienteId, List<ProdutoNota> itens, Double desconto) {}
+    record CriarNotaRequest(
+            Long clienteId,
+            List<ProdutoNota> itens,
+            List<ServicoNota> servicos,
+            Double desconto,
+            String observacao
+    ) {}
     record PagamentoRequest(StatusPagamento status) {}
     record DescontoRequest(Double desconto) {}
 }

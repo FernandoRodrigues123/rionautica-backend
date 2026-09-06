@@ -17,15 +17,17 @@ public class NotaService {
     private final NotaRepository notaRepository;
     private final ProdutoRepository produtoRepository;
     private final ClienteRepository clienteRepository;
-
+    private  final VeiculoService   veiculoService;
     public NotaService(
             NotaRepository notaRepository,
             ProdutoRepository produtoRepository,
-            ClienteRepository clienteRepository
+            ClienteRepository clienteRepository,
+            VeiculoService   veiculoService
     ) {
         this.notaRepository = notaRepository;
         this.produtoRepository = produtoRepository;
         this.clienteRepository = clienteRepository;
+        this.veiculoService =   veiculoService;
     }
 
     // -------------------------
@@ -57,50 +59,142 @@ public class NotaService {
     // Criação
     // -------------------------
 
-    @Transactional
-    public Nota criar(Long clienteId, List<ProdutoNota> itens, Double desconto) {
-   //     if ((itens == null || itens.isEmpty()) && (servicos == null || servicos.isEmpty())) {
-     //       throw new IllegalArgumentException("A nota deve ter pelo menos um produto ou serviço.");
-       // }
+
+    public Nota criar(Long clienteId, List<ProdutoNota> itens,
+                      List<ServicoNota> servicos, Double desconto,
+                      String observacao) {
+
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado: " + clienteId));
 
         Nota nota = new Nota();
-        nota.setData(LocalDateTime.now()); // data automática do dia
+        nota.setData(LocalDateTime.now());
         nota.setCliente(cliente);
-        nota.setStatusPagamento(StatusPagamento.ABERTO); // toda nota começa aberta
+        nota.setStatusPagamento(StatusPagamento.ABERTO);
         nota.setDesconto(desconto != null ? desconto : 0.0);
+        nota.setObservacao(observacao);
 
-        for (ProdutoNota item : itens) {
-            Produto produto = produtoRepository.findById(item.getProduto().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + item.getProduto().getId()));
+        // processa produtos
+        if (itens != null) {
+            for (ProdutoNota item : itens) {
+                Produto produto = produtoRepository.findById(item.getProduto().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + item.getProduto().getId()));
 
-            if (produto.getQuantidade() < item.getQuantidade()) {
-                throw new IllegalStateException(
-                        "Estoque insuficiente para o produto: " + produto.getNome() +
-                                ". Disponível: " + produto.getQuantidade()
-                );
+                if (produto.getQuantidade() < item.getQuantidade()) {
+                    throw new IllegalStateException(
+                            "Estoque insuficiente para: " + produto.getNome() +
+                                    ". Disponível: " + produto.getQuantidade()
+                    );
+                }
+
+                produto.setQuantidade(produto.getQuantidade() - item.getQuantidade());
+                produtoRepository.save(produto);
+
+                item.setNota(nota);
+                item.setValorUnitario(produto.getValor());
+                nota.getProdutos().add(item);
             }
-
-            // deduz do estoque
-            produto.setQuantidade(produto.getQuantidade() - item.getQuantidade());
-            produtoRepository.save(produto);
-
-            item.setNota(nota);
-            item.setValorUnitario(produto.getValor());
-            nota.getProdutos().add(item);
         }
 
+        // processa serviços
+        if (servicos != null) {
+            for (ServicoNota item : servicos) {
+                item.setNota(nota);
+                nota.getServicos().add(item);
+            }
+        }
+
+        // calcula valor bruto somando produtos + serviços
         double valorBruto = nota.getProdutos().stream()
+                .mapToDouble(i -> i.getValorUnitario() * i.getQuantidade())
+                .sum()
+                + nota.getServicos().stream()
                 .mapToDouble(i -> i.getValorUnitario() * i.getQuantidade())
                 .sum();
 
         nota.setValorBruto(valorBruto);
         nota.setValorTotal(valorBruto - nota.getDesconto());
 
-        return notaRepository.save(nota);
+        Nota salva = notaRepository.save(nota);
+
+        // delega pro VeiculoService
+        veiculoService.processarServicosDaNota(salva);
+
+        return salva;
     }
 
+    @Transactional
+    public Nota atualizar(Long id, Long clienteId, List<ProdutoNota> itens,
+                          List<ServicoNota> servicos, Double desconto,
+                          String observacao) {
+
+        Nota nota = buscarPorId(id);
+
+        if (nota.getStatusPagamento() == StatusPagamento.PAGO) {
+            throw new IllegalStateException("Nota já está paga e não pode ser alterada.");
+        }
+
+        // devolve estoque dos produtos antigos
+        for (ProdutoNota item : nota.getProdutos()) {
+            Produto produto = item.getProduto();
+            produto.setQuantidade(produto.getQuantidade() + item.getQuantidade());
+            produtoRepository.save(produto);
+        }
+
+        nota.getProdutos().clear();
+        nota.getServicos().clear();
+
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado: " + clienteId));
+        nota.setCliente(cliente);
+        nota.setObservacao(observacao);
+        nota.setDesconto(desconto != null ? desconto : 0.0);
+
+        // novos produtos
+        if (itens != null) {
+            for (ProdutoNota item : itens) {
+                Produto produto = produtoRepository.findById(item.getProduto().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + item.getProduto().getId()));
+
+                if (produto.getQuantidade() < item.getQuantidade()) {
+                    throw new IllegalStateException(
+                            "Estoque insuficiente para: " + produto.getNome() +
+                                    ". Disponível: " + produto.getQuantidade()
+                    );
+                }
+
+                produto.setQuantidade(produto.getQuantidade() - item.getQuantidade());
+                produtoRepository.save(produto);
+
+                item.setNota(nota);
+                item.setValorUnitario(produto.getValor());
+                nota.getProdutos().add(item);
+            }
+        }
+
+        // novos serviços
+        if (servicos != null) {
+            for (ServicoNota item : servicos) {
+                item.setNota(nota);
+                nota.getServicos().add(item);
+            }
+        }
+
+        double valorBruto = nota.getProdutos().stream()
+                .mapToDouble(i -> i.getValorUnitario() * i.getQuantidade())
+                .sum()
+                + nota.getServicos().stream()
+                .mapToDouble(i -> i.getValorUnitario() * i.getQuantidade())
+                .sum();
+
+        nota.setValorBruto(valorBruto);
+        nota.setValorTotal(valorBruto - nota.getDesconto());
+
+        Nota salva = notaRepository.save(nota);
+        veiculoService.processarServicosDaNota(salva);
+
+        return salva;
+    }
     // -------------------------
     // Pagamento
     // -------------------------

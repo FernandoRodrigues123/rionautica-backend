@@ -26,12 +26,23 @@ public class ServicoNota {
     @JoinColumn(name = "servico_id")
     private Servico servico;
 
+    @ManyToOne
+    @JoinColumn(name = "mecanico_id")
+    private Mecanico mecanico;
+
     @Column(nullable = false)
     private Integer quantidade;
 
     @Column(nullable = false)
     private Double valorUnitario;
 
-    @Column
+    @Column(length = 500)
     private String descricao;
+
+    @ManyToOne
+    @JoinColumn(name = "veiculo_id")
+    private Veiculo veiculo; // veículo ao qual este serviço foi prestado
+
+    @Column
+    private Double horasVeiculo; // horas do veículo no momento do serviço
 }
