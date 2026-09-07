@@ -2,10 +2,14 @@ package com.rionautica.loja.controller;
 
 import com.rionautica.loja.model.Produto;
 import com.rionautica.loja.services.ProdutoService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import java.util.List;
 
 @RestController
@@ -25,8 +29,10 @@ public class ProdutoController{
     }
 
     @GetMapping
-    public ResponseEntity<List<Produto>> listarTodos() {
-        return ResponseEntity.ok(produtoService.listarTodos());
+    public ResponseEntity<Page<Produto>> listarTodos(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamanho) {
+        return ResponseEntity.ok(produtoService.listarTodos(pagina, tamanho));
     }
 
     @GetMapping("/{id}")
