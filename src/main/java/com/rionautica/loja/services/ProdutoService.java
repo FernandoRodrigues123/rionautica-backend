@@ -20,6 +20,11 @@ public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
 
+    public Produto buscaPorCodigo(String codigo){
+        return produtoRepository.findByCodigo(codigo);
+    }
+
+
     public ProdutoService(ProdutoRepository produtoRepository) {
         this.produtoRepository = produtoRepository;
     }

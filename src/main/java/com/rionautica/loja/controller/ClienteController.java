@@ -4,6 +4,7 @@ import com.rionautica.loja.model.Cliente;
 import com.rionautica.loja.model.ClientePessoaFisica;
 import com.rionautica.loja.model.ClientePessoaJuridica;
 import com.rionautica.loja.services.ClienteService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +22,11 @@ public class ClienteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Cliente>> listarTodos() {
-        return ResponseEntity.ok(clienteService.listarTodos());
+    public ResponseEntity<Page<Cliente>> listarTodos(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamanho) {
+        return ResponseEntity.ok(clienteService.listarTodos(pagina, tamanho));
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<Cliente> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(clienteService.buscarPorId(id));

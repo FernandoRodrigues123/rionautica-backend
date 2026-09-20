@@ -5,6 +5,7 @@ import com.rionautica.loja.model.ProdutoNota;
 import com.rionautica.loja.model.ServicoNota;
 import com.rionautica.loja.model.StatusPagamento;
 import com.rionautica.loja.services.NotaService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,18 +26,21 @@ public class NotaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Nota>> listarTodas() {
-        return ResponseEntity.ok(notaService.listarTodas());
+    public ResponseEntity<Page<Nota>> listarTodas(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamanho) {
+        return ResponseEntity.ok(notaService.listarTodas(pagina, tamanho));
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<Nota> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(notaService.buscarPorId(id));
     }
-
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Nota>> listarPorStatus(@PathVariable StatusPagamento status) {
-        return ResponseEntity.ok(notaService.listarPorStatus(status));
+    public ResponseEntity<Page<Nota>> listarPorStatus(
+            @PathVariable StatusPagamento status,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamanho) {
+        return ResponseEntity.ok(notaService.listarPorStatus(status, pagina, tamanho));
     }
 
     @GetMapping("/cliente/{clienteId}")

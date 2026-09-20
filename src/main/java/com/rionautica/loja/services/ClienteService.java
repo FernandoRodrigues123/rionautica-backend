@@ -7,6 +7,10 @@ import com.rionautica.loja.model.ClientePessoaJuridica;
 import com.rionautica.loja.repository.ClienteRepository;
 import com.rionautica.loja.repository.ClientePessoaFisicaRepository;
 import com.rionautica.loja.repository.ClientePessoaJuridicaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,8 +36,9 @@ public class ClienteService {
     // Listagem e busca
     // -------------------------
 
-    public List<Cliente> listarTodos() {
-        return clienteRepository.findAll();
+    public Page<Cliente> listarTodos(int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("nome").ascending());
+        return clienteRepository.findAll(pageable);
     }
 
     public Cliente buscarPorId(Long id) {

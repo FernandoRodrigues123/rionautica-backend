@@ -22,6 +22,13 @@ public class ProdutoController{
         this.produtoService = produtoService;
     }
 
+    @GetMapping("/buscarPorCodigo/{codigo}")
+    public ResponseEntity<Produto> buscarPorCodigo(@PathVariable String codigo){
+        System.out.println("ola");
+        System.out.println(codigo);
+        return ResponseEntity.ok(produtoService.buscaPorCodigo(codigo   ));
+    }
+
     @PostMapping
     public ResponseEntity<Produto> salvar(@RequestBody Produto produto) {
         Produto salvo = produtoService.salvar(produto);

@@ -5,6 +5,10 @@ import com.rionautica.loja.model.*;
 import com.rionautica.loja.repository.ClienteRepository;
 import com.rionautica.loja.repository.NotaRepository;
 import com.rionautica.loja.repository.ProdutoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,19 +38,20 @@ public class NotaService {
     // Listagem e busca
     // -------------------------
 
-    public List<Nota> listarTodas() {
-        return notaRepository.findAll();
+    public Page<Nota> listarTodas(int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("data").descending());
+        return notaRepository.findAll(pageable);
     }
-
     public Nota buscarPorId(Long id) {
         return notaRepository.findById(id)
                 .orElseThrow(() -> new NotaNaoEncontradaException(id));
     }
 
-    public List<Nota> listarPorStatus(StatusPagamento status) {
-        return notaRepository.findByStatusPagamento(status);
-    }
 
+    public Page<Nota> listarPorStatus(StatusPagamento status, int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("data").descending());
+        return notaRepository.findByStatusPagamento(status, pageable);
+    }
     public List<Nota> listarPorCliente(Long clienteId) {
         return notaRepository.findByClienteId(clienteId);
     }
