@@ -26,9 +26,11 @@ public class ServicoNota {
     @JoinColumn(name = "servico_id")
     private Servico servico;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "mecanico_id")
+    @JsonIgnoreProperties("hibernateLazyInitializer")
     private Mecanico mecanico;
+
 
     @Column(nullable = false)
     private Integer quantidade;
