@@ -16,13 +16,12 @@ public class ServicoNota {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "nota_id")
     @JsonIgnoreProperties("servicos")
     private Nota nota;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "servico_id")
     private Servico servico;
 
@@ -41,9 +40,10 @@ public class ServicoNota {
     @Column(length = 500)
     private String descricao;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "veiculo_id")
-    private Veiculo veiculo; // veículo ao qual este serviço foi prestado
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Veiculo veiculo;
 
     @Column
     private Double horasVeiculo; // horas do veículo no momento do serviço
