@@ -24,8 +24,9 @@ public class Nota {
     @Column(nullable = false)
     private LocalDateTime data;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Cliente cliente;
 
     @OneToMany(mappedBy = "nota", cascade = CascadeType.ALL, orphanRemoval = true)
