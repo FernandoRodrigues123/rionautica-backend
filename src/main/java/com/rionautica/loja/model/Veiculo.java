@@ -59,10 +59,10 @@ public class Veiculo {
     private Boolean revisaoEmDia = true;
 
     @OneToMany(mappedBy = "veiculo", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("veiculo")
+    @JsonIgnoreProperties({"veiculo", "nota"})
     private List<ServicoVeiculo> servicos = new ArrayList<>();
 
     @OneToMany(mappedBy = "veiculo", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("veiculo")
+    @JsonIgnoreProperties({"veiculo", "nota"})
     private List<Revisao> revisoes = new ArrayList<>();
 }

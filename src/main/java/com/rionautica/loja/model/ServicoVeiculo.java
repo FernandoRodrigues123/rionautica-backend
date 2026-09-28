@@ -1,5 +1,6 @@
 package com.rionautica.loja.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -24,8 +25,9 @@ public class ServicoVeiculo {
     @JsonIgnoreProperties("servicos")
     private Veiculo veiculo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "nota_id")
+    @JsonIgnore
     private Nota nota;
 
     @ManyToOne

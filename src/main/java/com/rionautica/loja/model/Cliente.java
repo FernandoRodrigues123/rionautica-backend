@@ -47,6 +47,6 @@ public abstract class Cliente {
     private String estado;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("cliente")
+    @JsonIgnoreProperties({"cliente"})
     private List<Veiculo> veiculos = new ArrayList<>();
 }
