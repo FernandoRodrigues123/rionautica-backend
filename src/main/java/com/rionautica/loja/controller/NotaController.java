@@ -57,15 +57,26 @@ public class NotaController {
     }
 
     @PostMapping
-    public ResponseEntity<Nota> criar(@RequestBody CriarNotaRequest request) {
+    public ResponseEntity<Nota> criar(
+            @RequestBody CriarNotaRequest request
+    ) {
         Nota nota = notaService.criar(
                 request.clienteId(),
                 request.itens(),
                 request.servicos(),
                 request.desconto(),
-                request.observacao()
+                request.observacao(),
+                request.isOrcamento(),
+                request.agendamentoId()
         );
-        return ResponseEntity.status(HttpStatus.CREATED).body(nota);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(nota);
+    }
+    @PostMapping("/{id}/converter")
+    public ResponseEntity<Nota> converterParaNota(@PathVariable Long id) {
+        return ResponseEntity.ok(notaService.converterParaNota(id));
     }
 
     @PutMapping("/{id}")
@@ -114,7 +125,9 @@ public class NotaController {
             List<ProdutoNota> itens,
             List<ServicoNota> servicos,
             Double desconto,
-            String observacao
+            String observacao,
+            Boolean isOrcamento,
+            Long agendamentoId
     ) {}
     record PagamentoRequest(StatusPagamento status) {}
     record DescontoRequest(Double desconto) {}

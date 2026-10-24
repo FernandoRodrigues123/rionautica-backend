@@ -38,6 +38,14 @@ public class AgendamentoController {
         }
     }
 
+    @PutMapping("/cancelar/{id}")
+    public ResponseEntity<AgendamentoRecord> cancelar(@PathVariable Long id){
+        var ag = agendamentoService.cancelar(id);
+
+        return ResponseEntity.ok(new AgendamentoRecord(ag.getCliente().getId(),ag.getVeiculo().getId(),ag.getDescricao()));
+    }
+
+
     @GetMapping
     public List<Agendamentos> listar(){
         return agendamentoService.listar();
@@ -47,7 +55,13 @@ public class AgendamentoController {
             Long clienteId ,
             Long veiculoId,
             String descricao
-    ){}
+    ){
+        public AgendamentoRecord(Long clienteId, Long veiculoId, String descricao) {
+            this.clienteId = clienteId;
+            this.veiculoId = veiculoId;
+            this.descricao = descricao;
+        }
+    }
 
 
 }

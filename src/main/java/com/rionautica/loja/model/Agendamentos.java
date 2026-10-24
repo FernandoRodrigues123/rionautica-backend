@@ -26,6 +26,11 @@ public class Agendamentos {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Veiculo veiculo;
     private String descricao;
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
+    @OneToOne
+    private Nota nota;
 
 }

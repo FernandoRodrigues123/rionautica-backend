@@ -58,4 +58,10 @@ public class Nota {
     private Double valorPago = 0.0;
     @Column(columnDefinition = "TEXT")
     private String observacao;
+
+    @Column(name = "IS_ORCAMENTO")
+    private Boolean isOrcamento;
+
+    @OneToOne
+    private Agendamentos agendamentos;
 }
