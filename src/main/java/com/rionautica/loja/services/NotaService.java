@@ -94,6 +94,7 @@ public class NotaService {
         nota.setDesconto(desconto != null ? desconto : 0.0);
         nota.setObservacao(observacao);
         nota.setIsOrcamento(orcamento);
+        nota.setStatusPagamento(StatusPagamento.ORCAMENTO);
 
         // Vincula o agendamento, se informado
         if (agendamentoId != null) {
@@ -215,6 +216,7 @@ public class NotaService {
         }
 
         nota.setIsOrcamento(false);
+        nota.setStatusPagamento(StatusPagamento.ABERTO);
         nota.setData(LocalDateTime.now());
 
         Nota salva = notaRepository.save(nota);
@@ -355,10 +357,14 @@ public class NotaService {
             produtoRepository.save(produto);
         }
         var ag = nota.getAgendamentos();
-        ag.setStatus(Status.CANCELADO);
-        agendamentosRepository.save(ag);
-        notaRepository.delete(nota);
+        if(ag != null) {
+            ag.setStatus(Status.CANCELADO);
+            agendamentosRepository.save(ag);
+            notaRepository.delete(nota);
+        }else{
+            notaRepository.delete(nota);
 
+        }
     }
     @Transactional
     public Nota atualizar(Long id, Long clienteId, List<ProdutoNota> itens, Double desconto) {

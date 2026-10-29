@@ -1,7 +1,7 @@
 package com.rionautica.loja.controller;
 
 import com.rionautica.loja.model.Mecanico;
-import com.rionautica.loja.service.MecanicoService;
+import com.rionautica.loja.services.MecanicoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -74,7 +74,7 @@ public class NotaController {
                 .status(HttpStatus.CREATED)
                 .body(nota);
     }
-    @PostMapping("/{id}/converter")
+    @PutMapping("/{id}/converter")
     public ResponseEntity<Nota> converterParaNota(@PathVariable Long id) {
         return ResponseEntity.ok(notaService.converterParaNota(id));
     }

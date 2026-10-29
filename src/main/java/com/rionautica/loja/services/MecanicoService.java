@@ -1,4 +1,4 @@
-package com.rionautica.loja.service;
+package com.rionautica.loja.services;
 
 import com.rionautica.loja.model.Mecanico;
 import com.rionautica.loja.repository.MecanicoRepository;
